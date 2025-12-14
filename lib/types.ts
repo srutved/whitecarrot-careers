@@ -4,7 +4,6 @@ export interface Company {
   // basic company info
   name: string | null;
   slug: string | null;
-  description: string | null;
   website: string | null;
 
   // theme configuration
@@ -24,12 +23,14 @@ export interface Company {
   // timestamps
   created_at: string;
   updated_at: string;
+
+  jobs?: Job[];
 }
 
 
 export interface PageSection {
   id: string
-  type: "about" | "mission" | "life" | "values" | "custom"
+  type: "about" | "mission" | "life" | "values"
   title: string
   content: string
   images?: string[]
@@ -43,7 +44,8 @@ export interface Job {
   location: string
   type: "full-time" | "part-time" | "remote" | "contract"
   department: string
+  company_id: string
   description: string
   requirements: string[]
-  postedDate: string
+  posted_date: string
 }

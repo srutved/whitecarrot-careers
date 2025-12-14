@@ -17,14 +17,12 @@ export function SectionItem({ section, onEdit, onDelete, onToggleVisibility }: S
     mission: "Mission & Vision",
     life: "Life at Company",
     values: "Our Values",
-    custom: "Custom Section",
   }
 
   return (
     <div
-      className={`flex items-center gap-3 p-3 bg-card border border-border rounded-lg group transition-colors ${
-        !section.visible ? "opacity-60" : ""
-      }`}
+      className={`flex items-center gap-3 p-3 bg-card border border-border rounded-lg group transition-colors ${!section.visible ? "opacity-60" : ""
+        }`}
     >
       <button
         className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"

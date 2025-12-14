@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, X, Menu } from "lucide-react"
+import { ChevronDown, X, Menu, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,21 +14,79 @@ import { AddSectionDropdown } from "./add-section-dropdown"
 import { SectionEditorDialog } from "./section-editor-dialog"
 import type { Company, PageSection } from "@/lib/types"
 import { Textarea } from "../ui/textarea"
+import { set } from "date-fns"
 
 interface EditorSidebarProps {
+  company: Company | null
+  setCompany: (company: Company) => void
   companyDraft: Company | null
-  onViewPublic: () => void
   setCompanyDraft: (company: Company) => void
 }
 
 export function EditorSidebar({
-  companyDraft, onViewPublic, setCompanyDraft
+  company, setCompany, companyDraft, setCompanyDraft
 }: EditorSidebarProps) {
-  const [isCompanyDetailsOpen, setIsCompanyDetailsOpen] = useState(true)
-  const [isThemeOpen, setIsThemeOpen] = useState(true)
-  const [isSectionsOpen, setIsSectionsOpen] = useState(true)
   const [editingSection, setEditingSection] = useState<PageSection | null>(null)
   const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [slugStatus, setSlugStatus] = useState<
+    "idle" | "checking" | "available" | "taken"
+  >("idle");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSlugBlur = async () => {
+    if (!companyDraft?.slug) return;
+
+    if (company && company?.slug === companyDraft.slug) {
+      setSlugStatus("idle");
+      return;
+    }
+
+    setSlugStatus("checking");
+
+    const res = await fetch(
+      `/api/dashboard/check-slug?slug=${companyDraft?.slug}`
+    );
+
+    const data = await res.json();
+
+    if (data.available) {
+      setSlugStatus("available");
+    } else {
+      setSlugStatus("taken");
+    }
+  };
+
+  const handleSavePage = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSaving(true);
+
+    try {
+      if (slugStatus === "taken") {
+        setError("Please choose a different slug. This one is already taken.");
+        return;
+      }
+
+      fetch("/api/dashboard/save-page", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(companyDraft),
+      }).then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to save page");
+        } else {
+          setCompany({ ...companyDraft, is_published: true } as Company);
+        }
+      });
+    } catch (error) {
+      setError("Failed to save page. Please try again.")
+    } finally {
+      setTimeout(() => {
+        setIsSaving(false);
+      }, 1000);
+    }
+  }
 
   const handleAddSection = (type: PageSection["type"]) => {
     const newSection: PageSection = {
@@ -82,21 +140,17 @@ export function EditorSidebar({
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 space-y-4">
-        {/* Company Details */}
-        <Collapsible open={isCompanyDetailsOpen} onOpenChange={setIsCompanyDetailsOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-              <span className="font-bold text-sm text-foreground">Company Details</span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${isThemeOpen ? "rotate-180" : ""}`} />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4 px-4 pt-4">
+      <div className="flex-1 overflow-y-auto py-4 px-4">
+        <form className="space-y-4" onSubmit={handleSavePage}>
+          {/* Company Details */}
+          <span className="font-bold text-md text-foreground">Company Details</span>
+          <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <Label htmlFor="company-name" className="text-sm font-medium text-foreground">
                 Company Name
               </Label>
               <Input
+                required
                 id="company-name"
                 value={companyDraft?.name || ""}
                 onChange={(e) => handleCompanyDraftChange("name", e.target.value)}
@@ -108,23 +162,31 @@ export function EditorSidebar({
                 Company Slug
               </Label>
               <Input
+                required
                 id="company-slug"
                 value={companyDraft?.slug || ""}
                 onChange={(e) => handleCompanyDraftChange("slug", e.target.value)}
                 placeholder="your-company"
+                onBlur={handleSlugBlur}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="company-description" className="text-sm font-medium text-foreground">
-                Description
-              </Label>
-              <Textarea
-                rows={4}
-                id="company-description"
-                value={companyDraft?.description || ""}
-                onChange={(e) => handleCompanyDraftChange("description", e.target.value)}
-                placeholder="A brief description of your company"
-              />
+              {slugStatus === "checking" && (
+                <p className="text-sm text-muted-foreground">
+                  Checking availability...
+                </p>
+              )}
+
+              {slugStatus === "available" && (
+                <p className="text-sm text-green-600">
+                  Slug is available ✅
+                </p>
+              )}
+
+              {slugStatus === "taken" && (
+                <p className="text-sm text-red-600">
+                  This slug is already taken ❌
+                </p>
+              )}
+
             </div>
             <div className="space-y-2">
               <Label htmlFor="company-website" className="text-sm font-medium text-foreground">
@@ -149,21 +211,11 @@ export function EditorSidebar({
               onChange={(banner) => handleCompanyDraftChange("banner_url", banner)}
               aspectRatio="banner"
             />
-            <Button className="w-full">Save Company Details</Button>
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
 
-        <div className="border-t border-border" />
-
-        {/* Theme Section */}
-        <Collapsible open={isThemeOpen} onOpenChange={setIsThemeOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-              <span className="font-bold text-sm text-foreground">Company Theme</span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${isThemeOpen ? "rotate-180" : ""}`} />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4 px-4 pt-4">
+          {/* Company Theme */}
+          <span className="font-bold text-md text-foreground">Company Theme</span>
+          <div className="space-y-4 pt-2">
             <ColorPicker
               label="Primary Color"
               value={companyDraft?.primary_color || ""}
@@ -190,21 +242,11 @@ export function EditorSidebar({
                 placeholder="https://youtube.com/embed/..."
               />
             </div>
-            <Button className="w-full">Save Theme</Button>
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
 
-        <div className="border-t border-border" />
-
-        {/* Sections */}
-        <Collapsible open={isSectionsOpen} onOpenChange={setIsSectionsOpen}>
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between p-0 h-auto hover:bg-transparent">
-              <span className="font-bold text-sm text-foreground">Page Sections</span>
-              <ChevronDown className={`h-4 w-4 transition-transform ${isSectionsOpen ? "rotate-180" : ""}`} />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-3 pt-4 px-4">
+          {/* Page Sections */}
+          <span className="font-bold text-md text-foreground">Page Sections</span>
+          <div className="space-y-4 pt-2">
             {(companyDraft?.sections || [])
               .sort((a, b) => a.order - b.order)
               .map((section) => (
@@ -217,10 +259,15 @@ export function EditorSidebar({
                 />
               ))}
             <AddSectionDropdown onAdd={handleAddSection} />
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
 
-        <div className="border-t border-border" />
+          {error && <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{error}</div>}
+
+          <Button type="submit" className="w-full" disabled={isSaving}>{isSaving ? <>
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            Saving...
+          </> : "Save Page"}</Button>
+        </form>
       </div>
 
       {/* <SectionEditorDialog

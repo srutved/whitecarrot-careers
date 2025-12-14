@@ -12,9 +12,10 @@ interface JobListProps {
   disabled?: boolean
   textColor?: string
   primaryColor?: string
+  secondaryColor?: string
 }
 
-export function JobList({ jobs, disabled, primaryColor, textColor }: JobListProps) {
+export function JobList({ jobs, disabled, primaryColor, textColor, secondaryColor }: JobListProps) {
   const [searchQuery, setSearchQuery] = useState("")
   const [locationFilter, setLocationFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
@@ -37,9 +38,9 @@ export function JobList({ jobs, disabled, primaryColor, textColor }: JobListProp
         <div className="flex justify-center items-center gap-3">
           <div
             className="w-10 h-10 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: primaryColor }}
+            style={{ backgroundColor: secondaryColor }}
           >
-            <Briefcase className="h-5 w-5 text-primary-foreground" />
+            <Briefcase className="h-5 w-5" />
           </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold" style={{ color: textColor }}>

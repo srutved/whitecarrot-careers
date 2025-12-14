@@ -17,7 +17,6 @@ export function AddSectionDropdown({ onAdd }: AddSectionDropdownProps) {
     { type: "mission", label: "Mission & Vision", icon: <Target className="h-4 w-4" /> },
     { type: "life", label: "Life at Company", icon: <ImageIcon className="h-4 w-4" /> },
     { type: "values", label: "Our Values", icon: <Heart className="h-4 w-4" /> },
-    { type: "custom", label: "Custom HTML/Markdown", icon: <Code className="h-4 w-4" /> },
   ]
 
   return (

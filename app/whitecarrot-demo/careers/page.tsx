@@ -14,7 +14,7 @@ export default function CareersPage() {
         <main id="main-content" className="min-h-screen bg-background">
             <CareersHeader companyName={dummyCompanyData.name} theme={dummyCompanyData.theme} />
             <SectionRenderer sections={dummyCompanyData.sections} theme={dummyCompanyData.theme} />
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                 <JobList jobs={dummyCompanyData.jobs} theme={dummyCompanyData.theme} />
             </div>
 

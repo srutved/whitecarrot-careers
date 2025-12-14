@@ -19,31 +19,43 @@ export async function GET() {
   const { data, error } = await supabase
     .from("users")
     .select(`
+    id,
+    email,
+    name,
+    role,
+    company_id,
+    companies (
       id,
-      email,
       name,
-      role,
-      company_id,
-      companies (
+      slug,
+      description,
+      website,
+      primary_color,
+      secondary_color,
+      text_color,
+      logo_url,
+      banner_url,
+      culture_video_url,
+      sections,
+      is_published,
+      created_at,
+      updated_at,
+      jobs (
         id,
-        name,
-        slug,
+        title,
+        location,
+        type,
+        department,
         description,
-        website,
-        primary_color,
-        secondary_color,
-        text_color,
-        logo_url,
-        banner_url,
-        culture_video_url,
-        sections,
-        is_published,
+        requirements,
+        posted_date,
         created_at,
         updated_at
       )
-    `)
+    )
+  `)
     .eq("id", authUser.id)
-    .single();
+    .single()
 
   if (error) {
     return NextResponse.json(

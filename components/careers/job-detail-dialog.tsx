@@ -61,7 +61,7 @@ export function JobDetailDialog({ job, isOpen, onClose, primaryColor, textColor 
             </Badge>
             <Badge variant="secondary" className="flex items-center gap-1">
               <Calendar className="h-3 w-3" />
-              Posted {formatDate(job.postedDate)}
+              Posted {formatDate(job.posted_date)}
             </Badge>
           </div>
 

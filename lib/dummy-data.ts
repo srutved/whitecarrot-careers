@@ -1,4 +1,4 @@
-import type { CompanyData, Job, PageSection } from "./types"
+import type { Company, Job, PageSection } from "./types"
 
 export const dummySections: PageSection[] = [
   {
@@ -60,7 +60,7 @@ export const dummyJobs: Job[] = [
       "Experience with modern CSS and design systems",
       "Excellent communication skills",
     ],
-    postedDate: "2024-01-15",
+    posted_date: "2024-01-15", company_id: "c1",
   },
   {
     id: "j2",
@@ -76,7 +76,8 @@ export const dummyJobs: Job[] = [
       "Proficiency in Figma",
       "Experience with user research",
     ],
-    postedDate: "2024-01-12",
+    posted_date: "2024-01-12",
+    company_id: "c1",
   },
   {
     id: "j3",
@@ -92,7 +93,7 @@ export const dummyJobs: Job[] = [
       "Experience with Kubernetes and Docker",
       "Infrastructure as Code expertise",
     ],
-    postedDate: "2024-01-10",
+    posted_date: "2024-01-10", company_id: "c1",
   },
   {
     id: "j4",
@@ -108,7 +109,7 @@ export const dummyJobs: Job[] = [
       "Experience with marketing automation tools",
       "Excellent writing and communication",
     ],
-    postedDate: "2024-01-08",
+    posted_date: "2024-01-08", company_id: "c1",
   },
   {
     id: "j5",
@@ -124,7 +125,7 @@ export const dummyJobs: Job[] = [
       "Excellent communication abilities",
       "Experience with CRM tools",
     ],
-    postedDate: "2024-01-05",
+    posted_date: "2024-01-05", company_id: "c1",
   },
   {
     id: "j6",
@@ -140,21 +141,24 @@ export const dummyJobs: Job[] = [
       "Strong presentation skills",
       "Portfolio of research work",
     ],
-    postedDate: "2024-01-03",
+    posted_date: "2024-01-03", company_id: "c1",
   },
 ]
 
-export const dummyCompanyData: CompanyData = {
+export const dummyCompanyData: Company = {
+  id: "c1",
+  website: "https://www.whitecarrot.com",
+  is_published: true,
+  created_at: "2023-01-01T00:00:00Z",
+  updated_at: "2024-01-01T00:00:00Z",
   slug: "whitecarrot-demo",
   name: "WhiteCarrot Careers",
-  theme: {
-    logo: "/whitecarrot-careers-logo.png",
-    banner: "/company-retreat-tropical-beach.jpg",
-    primaryColor: "#0ea5e9",
-    secondaryColor: "#64748b",
-    textColor: "#0f172a",
-    cultureVideoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-  },
+  logo_url: "/whitecarrot-careers-logo.png",
+  banner_url: "/company-retreat-tropical-beach.jpg",
+  primary_color: "#0ea5e9",
+  secondary_color: "#64748b",
+  text_color: "#0f172a",
+  culture_video_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
   sections: dummySections,
   jobs: dummyJobs,
 }
