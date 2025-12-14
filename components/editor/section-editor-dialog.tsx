@@ -1,11 +1,18 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { ImageUpload } from "@/components/ui/image-upload"
 import type { PageSection } from "@/lib/types"
 
 interface SectionEditorDialogProps {
@@ -15,64 +22,105 @@ interface SectionEditorDialogProps {
   onSave: (section: PageSection) => void
 }
 
-export function SectionEditorDialog({ section, isOpen, onClose, onSave }: SectionEditorDialogProps) {
+export function SectionEditorDialog({
+  section,
+  isOpen,
+  onClose,
+  onSave
+}: SectionEditorDialogProps) {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
+  const [images, setImages] = useState<string[]>([])
 
   useEffect(() => {
     if (section) {
       setTitle(section.title)
-      setContent(section.content)
+      setContent(section.content || "")
+      setImages(section.images || [])
     }
   }, [section])
 
+  const updateImageAtIndex = (index: number, value: string) => {
+    setImages(prev => {
+      const updated = [...prev]
+      updated[index] = value
+      return updated
+    })
+  }
+
   const handleSave = () => {
-    if (section) {
-      onSave({
-        ...section,
-        title,
-        content,
-      })
-    }
+    if (!section) return
+
+    onSave({
+      ...section,
+      title,
+      content,
+      images: section.type === "life" ? images.filter(Boolean) : undefined
+    })
+
     onClose()
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg overflow-y-auto max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>Edit Section</DialogTitle>
         </DialogHeader>
+
         <div className="space-y-4 py-4">
+          {/* Title */}
           <div className="space-y-2">
-            <Label htmlFor="section-title">Section Title</Label>
+            <Label>Section Title</Label>
             <Input
-              id="section-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter section title"
             />
           </div>
+
+          {/* Content */}
           <div className="space-y-2">
-            <Label htmlFor="section-content">Content</Label>
+            <Label>Content</Label>
             <Textarea
-              id="section-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Enter section content"
-              rows={8}
+              rows={6}
               className="resize-none"
             />
-            {section?.type === "values" && (
-              <p className="text-xs text-muted-foreground">For values, use format: Title|Description (one per line)</p>
-            )}
           </div>
+
+          {/* Life at Company Images */}
+          {section?.type === "life" && (
+            <div className="space-y-3">
+              <Label>Life at Company Images</Label>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[0, 1, 2, 3].map((index) => (
+                  <ImageUpload
+                    key={index}
+                    label={`Image ${index + 1}`}
+                    value={images[index] || ""}
+                    onChange={(url) => updateImageAtIndex(index, url || "")}
+                    aspectRatio="square"
+                  />
+                ))}
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Upload up to 4 images showcasing culture, events, or workspace.
+              </p>
+            </div>
+          )}
         </div>
+
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save Changes</Button>
+          <Button type="button" onClick={handleSave}>
+            Save Changes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

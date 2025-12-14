@@ -15,6 +15,19 @@ import { SectionEditorDialog } from "./section-editor-dialog"
 import type { Company, PageSection } from "@/lib/types"
 import { Textarea } from "../ui/textarea"
 import { set } from "date-fns"
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core"
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove
+} from "@dnd-kit/sortable"
+import { SortableSectionItem } from "./sortable-section-item"
 
 interface EditorSidebarProps {
   company: Company | null
@@ -33,6 +46,36 @@ export function EditorSidebar({
     "idle" | "checking" | "available" | "taken"
   >("idle");
   const [isSaving, setIsSaving] = useState(false);
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 5 }
+    })
+  )
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event
+
+    if (!over || active.id === over.id) return
+
+    const oldIndex = companyDraft!.sections.findIndex(
+      (s) => s.id === active.id
+    )
+    const newIndex = companyDraft!.sections.findIndex(
+      (s) => s.id === over.id
+    )
+
+    const reordered = arrayMove(companyDraft!.sections, oldIndex, newIndex).map(
+      (section, index) => ({
+        ...section,
+        order: index + 1
+      })
+    )
+
+    setCompanyDraft({
+      ...companyDraft!,
+      sections: reordered
+    })
+  }
 
   const handleSlugBlur = async () => {
     if (!companyDraft?.slug) return;
@@ -76,8 +119,11 @@ export function EditorSidebar({
         if (!res.ok) {
           throw new Error("Failed to save page");
         } else {
-          setCompany({ ...companyDraft, is_published: true } as Company);
+          return res.json();
         }
+      }).then((data) => {
+        setCompanyDraft({ ...companyDraft, id: data?.company?.id, is_published: true } as Company);
+        setCompany({ ...companyDraft, id: data?.company?.id, is_published: true } as Company);
       });
     } catch (error) {
       setError("Failed to save page. Please try again.")
@@ -106,19 +152,35 @@ export function EditorSidebar({
       order: (companyDraft?.sections?.length || 0) + 1,
       visible: true,
     }
-    // onSectionsChange([...sections, newSection])
+    setCompanyDraft({
+      ...companyDraft!,
+      sections: [...(companyDraft?.sections || []), newSection],
+    })
   }
 
   const handleDeleteSection = (id: string) => {
-    // onSectionsChange(sections.filter((s) => s.id !== id))
+    setCompanyDraft({
+      ...companyDraft!,
+      sections: companyDraft!.sections.filter((section) => section.id !== id),
+    })
   }
 
   const handleToggleVisibility = (id: string) => {
-    // onSectionsChange(sections.map((s) => (s.id === id ? { ...s, visible: !s.visible } : s)))
+    setCompanyDraft({
+      ...companyDraft!,
+      sections: companyDraft!.sections.map((section) =>
+        section.id === id ? { ...section, visible: !section.visible } : section
+      ),
+    })
   }
 
   const handleSaveSection = (updatedSection: PageSection) => {
-    // onSectionsChange(sections.map((s) => (s.id === updatedSection.id ? updatedSection : s)))
+    setCompanyDraft({
+      ...companyDraft!,
+      sections: companyDraft!.sections.map((section) =>
+        section.id === updatedSection.id ? updatedSection : section
+      ),
+    })
   }
 
   const handleCompanyDraftChange = (field: keyof Company, value: any) => {
@@ -241,24 +303,37 @@ export function EditorSidebar({
                 onChange={(e) => handleCompanyDraftChange("culture_video_url", e.target.value)}
                 placeholder="https://youtube.com/embed/..."
               />
+              <p className="text-xs">Shown in "Life at Company" page section</p>
             </div>
           </div>
 
           {/* Page Sections */}
           <span className="font-bold text-md text-foreground">Page Sections</span>
           <div className="space-y-4 pt-2">
-            {(companyDraft?.sections || [])
-              .sort((a, b) => a.order - b.order)
-              .map((section) => (
-                <SectionItem
-                  key={section.id}
-                  section={section}
-                  onEdit={() => setEditingSection(section)}
-                  onDelete={() => handleDeleteSection(section.id)}
-                  onToggleVisibility={() => handleToggleVisibility(section.id)}
-                />
-              ))}
-            <AddSectionDropdown onAdd={handleAddSection} />
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={(companyDraft?.sections || []).map((s) => s.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {(companyDraft?.sections || [])
+                  .sort((a, b) => a.order - b.order)
+                  .map((section) => (
+                    <SortableSectionItem
+                      key={section.id}
+                      section={section}
+                      onEdit={() => setEditingSection(section)}
+                      onDelete={() => handleDeleteSection(section.id)}
+                      onToggleVisibility={() => handleToggleVisibility(section.id)}
+                    />
+                  ))}
+              </SortableContext>
+            </DndContext>
+
+            <AddSectionDropdown onAdd={handleAddSection} sections={companyDraft?.sections} />
           </div>
 
           {error && <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">{error}</div>}
@@ -270,12 +345,12 @@ export function EditorSidebar({
         </form>
       </div>
 
-      {/* <SectionEditorDialog
+      <SectionEditorDialog
         section={editingSection}
         isOpen={!!editingSection}
         onClose={() => setEditingSection(null)}
         onSave={handleSaveSection}
-      /> */}
+      />
     </div>
   )
 

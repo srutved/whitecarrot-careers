@@ -123,9 +123,9 @@ export default function EditorPage() {
           <div className="p-4 border-b border-border flex items-center justify-between">
             <h2 className="font-semibold text-lg text-foreground">Live Preview</h2>
             <div className="space-x-2 flex items-center">
-              <Button onClick={() => setCreateJobOpen(true)}>
+              {company?.is_published && <Button onClick={() => setCreateJobOpen(true)}>
                 + Create Job
-              </Button>
+              </Button>}
 
               {company?.is_published && <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -165,7 +165,7 @@ export default function EditorPage() {
         </div>
         <div className="pb-16">
           <CareersHeader company={companyDraft} />
-          {/* <SectionRenderer /> */}
+          <SectionRenderer sections={companyDraft?.sections} primary_color={companyDraft?.primary_color || "#000000"} secondary_color={companyDraft?.secondary_color || "#ADD8E6"} text_color={companyDraft?.text_color || "#000000"} culture_video_url={companyDraft?.culture_video_url} />
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <JobList jobs={jobs} primaryColor={companyDraft?.primary_color || "#000000"} secondaryColor={companyDraft?.secondary_color || "#ADD8E6"} textColor={companyDraft?.text_color || "#000000"} />
           </div>

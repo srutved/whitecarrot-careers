@@ -9,9 +9,11 @@ interface SectionItemProps {
   onEdit: () => void
   onDelete: () => void
   onToggleVisibility: () => void
+  dragHandleProps?: React.HTMLAttributes<HTMLButtonElement>
 }
 
-export function SectionItem({ section, onEdit, onDelete, onToggleVisibility }: SectionItemProps) {
+
+export function SectionItem({ section, onEdit, onDelete, onToggleVisibility, dragHandleProps }: SectionItemProps) {
   const sectionTypeLabels: Record<PageSection["type"], string> = {
     about: "About Us",
     mission: "Mission & Vision",
@@ -25,17 +27,21 @@ export function SectionItem({ section, onEdit, onDelete, onToggleVisibility }: S
         }`}
     >
       <button
+        type="button"
+        {...dragHandleProps}
         className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground transition-colors"
         aria-label="Drag to reorder"
       >
         <GripVertical className="h-5 w-5" />
       </button>
+
       <div className="flex-1 min-w-0">
         <p className="font-medium text-sm text-foreground truncate">{section.title}</p>
         <p className="text-xs text-muted-foreground">{sectionTypeLabels[section.type]}</p>
       </div>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="h-8 w-8"
@@ -44,10 +50,11 @@ export function SectionItem({ section, onEdit, onDelete, onToggleVisibility }: S
         >
           {section.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit} aria-label="Edit section">
+        <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit} aria-label="Edit section">
           <Pencil className="h-4 w-4" />
         </Button>
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="h-8 w-8 text-destructive hover:text-destructive"

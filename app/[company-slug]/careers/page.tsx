@@ -51,7 +51,7 @@ export default function CareersPage() {
   return (
     <main id="main-content" className="min-h-screen bg-background">
       <CareersHeader company={companyData as Company} />
-      {/* <SectionRenderer sections={dummyCompanyData.sections} theme={dummyCompanyData.theme} /> */}
+      <SectionRenderer sections={companyData?.sections || []} primary_color={companyData?.primary_color || "#000000"} secondary_color={companyData?.secondary_color || "#ADD8E6"} text_color={companyData?.text_color || "#000000"} culture_video_url={companyData?.culture_video_url || ""} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <JobList jobs={jobs} secondaryColor={companyData?.secondary_color || "#ADD8E6"} primaryColor={companyData?.primary_color || "#000000"} textColor={companyData?.text_color || "#000000"} />
       </div>

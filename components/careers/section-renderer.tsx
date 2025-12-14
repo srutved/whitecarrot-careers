@@ -97,19 +97,6 @@ export function SectionRenderer({ sections, culture_video_url, primary_color, se
           </div>
         )
 
-      case "custom":
-        return (
-          <div key={section.id} className="py-12 md:py-16">
-            <h2 className="text-2xl text-center md:text-3xl font-bold mb-6" style={{ color: text_color || "black" }}>
-              {section.title}
-            </h2>
-            <div
-              className="prose prose-lg max-w-none text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: section.content }}
-            />
-          </div>
-        )
-
       default:
         return null
     }
