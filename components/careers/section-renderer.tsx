@@ -19,20 +19,20 @@ export function SectionRenderer({ sections, culture_video_url, primary_color, se
       case "mission":
         return (
           <div key={section.id} className="py-12 md:py-16">
-            <h2 className="text-2xl text-center md:text-3xl font-bold mb-6" style={{ color: text_color || "black" }}>
+            <h2 className="text-2xl text-center md:text-3xl font-bold mb-6" style={{ color: primary_color || "black" }}>
               {section.title}
             </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed text-justify">{section.content}</p>
+            <p className="text-muted-foreground text-lg leading-relaxed text-justify" style={{ color: text_color || "black" }}>{section.content}</p>
           </div>
         )
 
       case "life":
         return (
           <div key={section.id} className="py-12 md:py-16">
-            <h2 className="text-2xl text-center md:text-3xl font-bold mb-6" style={{ color: text_color || "black" }}>
+            <h2 className="text-2xl text-center md:text-3xl font-bold mb-6" style={{ color: primary_color || "black" }}>
               {section.title}
             </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed mb-8 text-justify">{section.content}</p>
+            <p className="text-muted-foreground text-lg leading-relaxed mb-8 text-justify" style={{ color: text_color || "black" }}>{section.content}</p>
             {section.images && section.images.length > 0 && (
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {section.images.map((img, idx) => (
@@ -72,7 +72,7 @@ export function SectionRenderer({ sections, culture_video_url, primary_color, se
           })
         return (
           <div key={section.id} className="py-12 md:py-16">
-            <h2 className="text-2xl text-center md:text-3xl font-bold mb-8" style={{ color: text_color || "black" }}>
+            <h2 className="text-2xl text-center md:text-3xl font-bold mb-8" style={{ color: primary_color || "black" }}>
               {section.title}
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -83,14 +83,14 @@ export function SectionRenderer({ sections, culture_video_url, primary_color, se
                 >
                   <div
                     className="w-10 h-10 rounded-lg mb-4 flex items-center justify-center text-primary-foreground font-bold"
-                    style={{ backgroundColor: primary_color || "#000000" }}
+                    style={{ backgroundColor: secondary_color || "#000000" }}
                   >
                     {idx + 1}
                   </div>
-                  <h3 className="text-lg font-semibold mb-2" style={{ color: text_color || "black" }}>
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: primary_color || "black" }}>
                     {value.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm">{value.description}</p>
+                  <p className="text-muted-foreground text-sm" style={{ color: text_color || "black" }}>{value.description}</p>
                 </div>
               ))}
             </div>

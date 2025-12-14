@@ -10,6 +10,10 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Whitecarrot Careers",
   description: "Build beautiful, customizable career pages that showcase your company culture and attract top talent.",
+  robots: {
+    index: true,
+    follow: true,
+  },
 }
 
 export default function RootLayout({
