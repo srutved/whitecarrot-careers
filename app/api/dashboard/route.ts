@@ -55,7 +55,7 @@ export async function GET() {
     )
   `)
     .eq("id", authUser.id)
-    .single()
+    .maybeSingle()
 
   if (error) {
     return NextResponse.json(
@@ -63,15 +63,15 @@ export async function GET() {
       { status: 500 }
     );
   }
-
+  console.log("Dashboard data fetched for user:", data);
   return NextResponse.json({
     user: {
-      id: data.id,
-      email: data.email,
-      name: data.name,
-      role: data.role,
-      company_id: data.company_id,
+      id: data?.id,
+      email: data?.email,
+      name: data?.name,
+      role: data?.role,
+      company_id: data?.company_id,
     },
-    company: data.companies,
+    company: data?.companies,
   });
 }

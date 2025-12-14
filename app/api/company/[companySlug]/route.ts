@@ -48,7 +48,7 @@ export async function GET(
     `)
         .eq("slug", companySlug)
         .eq("is_published", true)
-        .single();
+        .maybeSingle();
 
     if (error || !data) {
         return NextResponse.json(

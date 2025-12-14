@@ -31,7 +31,7 @@ export async function POST(req: Request) {
             .from("users")
             .select("*")
             .eq("email", email)
-            .single();
+            .maybeSingle();
 
         return NextResponse.json({ success: true, data });
     } catch {

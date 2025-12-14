@@ -22,7 +22,7 @@ export async function POST(req: Request) {
         .from("users")
         .select("id, company_id")
         .eq("id", authUser.id)
-        .single();
+        .maybeSingle();
 
     if (userError) {
         return NextResponse.json(
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     }
 
     // 3. CREATE COMPANY (first time)
-    if (!user.company_id) {
+    if (!user?.company_id) {
         const { data: company, error: createError } = await supabase
             .from("companies")
             .insert({
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
                 is_published: true,
             })
             .select()
-            .single();
+            .maybeSingle();
 
         if (createError) {
             return NextResponse.json(
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
         await supabase
             .from("users")
             .update({ company_id: company.id })
-            .eq("id", user.id);
+            .eq("id", user?.id);
 
         return NextResponse.json({ company });
     }
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
         })
         .eq("id", user.company_id)
         .select()
-        .single();
+        .maybeSingle();
 
     if (updateError) {
         return NextResponse.json(
