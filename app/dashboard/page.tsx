@@ -75,7 +75,7 @@ export default function EditorPage() {
     loadDashboard();
   }, [router]);
 
-  const publicUrl = `${window.location.origin}/${company?.slug}/careers`;
+  const publicUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${company?.slug}/careers`;
 
   const handleCopy = async (e: any) => {
     e.preventDefault()
