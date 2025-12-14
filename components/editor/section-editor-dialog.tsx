@@ -88,6 +88,9 @@ export function SectionEditorDialog({
               rows={6}
               className="resize-none"
             />
+            {section?.type === "values" && (
+              <p className="text-xs text-muted-foreground">For values, use format: Title|Description (one per line)</p>
+            )}
           </div>
 
           {/* Life at Company Images */}
